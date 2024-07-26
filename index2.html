@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOS Probability Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+            margin: 0;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            padding: 10px;
+            width: 100%;
+            max-width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+            text-align: center;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Probability of >10 Day Length of Stay</h1>
+        <div class="form-group">
+            <label for="age">Age</label>
+            <input type="number" id="age" required>
+        </div>
+        <div class="form-group">
+            <label for="sex">Sex</label>
+            <select id="sex" required>
+                <option value="M">Male</option>
+                <option value="F">Female</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="tumorSize">Tumor Size</label>
+            <select id="tumorSize" required>
+                <option value="large">> 11.00 cm</option>
+                <option value="small">< 11.00 cm</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="readmission">30 Day Readmission</label>
+            <select id="readmission" required>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="systemicTherapy">Systemic Therapy</label>
+            <select id="systemicTherapy" required>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="resection">Extent of Resection</label>
+            <select id="resection" required>
+                <option value="GTR">GTR</option>
+                <option value="STR">STR</option>
+            </select>
+        </div>
+        <button onclick="calculateProbability()">Calculate</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function calculateProbability() {
+            // Get input values
+            const age = parseFloat(document.getElementById('age').value);
+            const sex = document.getElementById('sex').value;
+            const tumorSize = document.getElementById('tumorSize').value;
+            const readmission = document.getElementById('readmission').value;
+            const systemicTherapy = document.getElementById('systemicTherapy').value;
+            const resection = document.getElementById('resection').value;
+
+            // Logistic regression coefficients (log-odds)
+            const intercept = -2.5; // Hypothetical intercept value
+            const ageCoef = Math.log(1.02);
+            const sexCoef = sex === 'F' ? Math.log(0.80) : 0;
+            const tumorSizeCoef = tumorSize === 'large' ? Math.log(1.98) : 0;
+            const readmissionCoef = readmission === 'yes' ? Math.log(1.67) : 0;
+            const systemicTherapyCoef = systemicTherapy === 'yes' ? Math.log(1.91) : 0;
+            const resectionCoef = resection === 'GTR' ? Math.log(2.16) : 0;
+
+            // Calculate log-odds
+            const logOdds = intercept + (ageCoef * age) + sexCoef + tumorSizeCoef + readmissionCoef + systemicTherapyCoef + resectionCoef;
+
+            // Convert log-odds to probability
+            const odds = Math.exp(logOdds);
+            const probability = odds / (1 + odds);
+
+            // Display the result
+            document.getElementById('result').innerText = `Probability of >10 day LOS: ${(probability * 100).toFixed(2)}%`;
+        }
+    </script>
+</body>
+</html>
