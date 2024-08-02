@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LOS Probability Calculator</title>
+    <title>Prolonged LOS Probability Calculator</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -65,7 +65,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Probability of >10 Day Length of Stay</h1>
+        <h1>Probability of Prolonged LOS</h1>
         <div class="form-group">
             <label for="age">Age</label>
             <input type="number" id="age" required>
@@ -78,24 +78,14 @@
             </select>
         </div>
         <div class="form-group">
-            <label for="tumorSize">Tumor Size</label>
-            <select id="tumorSize" required>
-                <option value="large">> 11.00 cm</option>
-                <option value="small">< 11.00 cm</option>
-            </select>
+            <label for="tumorSize">Tumor Size (cm)</label>
+            <input type="number" step="0.01" id="tumorSize" required>
         </div>
         <div class="form-group">
-            <label for="readmission">30 Day Readmission</label>
-            <select id="readmission" required>
-                <option value="yes">Yes</option>
-                <option value="no">No</option>
-            </select>
-        </div>
-        <div class="form-group">
-            <label for="systemicTherapy">Systemic Therapy</label>
-            <select id="systemicTherapy" required>
-                <option value="yes">Yes</option>
-                <option value="no">No</option>
+            <label for="tumorLocation">Tumor Location</label>
+            <select id="tumorLocation" required>
+                <option value="Sacrum/Coccyx">Sacrum/Coccyx</option>
+                <option value="Spine">Spine</option>
             </select>
         </div>
         <div class="form-group">
@@ -114,30 +104,29 @@
             // Get input values
             const age = parseFloat(document.getElementById('age').value);
             const sex = document.getElementById('sex').value;
-            const tumorSize = document.getElementById('tumorSize').value;
-            const readmission = document.getElementById('readmission').value;
-            const systemicTherapy = document.getElementById('systemicTherapy').value;
+            const tumorSize = parseFloat(document.getElementById('tumorSize').value);
+            const tumorLocation = document.getElementById('tumorLocation').value;
             const resection = document.getElementById('resection').value;
 
             // Logistic regression coefficients (log-odds)
             const intercept = -2.5; // Hypothetical intercept value
-            const ageCoef = Math.log(1.02);
-            const sexCoef = sex === 'F' ? Math.log(0.80) : 0;
-            const tumorSizeCoef = tumorSize === 'large' ? Math.log(1.98) : 0;
-            const readmissionCoef = readmission === 'yes' ? Math.log(1.67) : 0;
-            const systemicTherapyCoef = systemicTherapy === 'yes' ? Math.log(1.91) : 0;
-            const resectionCoef = resection === 'GTR' ? Math.log(2.16) : 0;
+            const ageCoef = Math.log(1.015);
+            const sexCoef = sex === 'M' ? Math.log(1.44) : 0;
+            const tumorSizeCoef = Math.log(1.001) * tumorSize;
+            const tumorLocationCoef = tumorLocation === 'Sacrum/Coccyx' ? Math.log(1.831) : 0;
+            const resectionCoef = resection === 'GTR' ? Math.log(1.699) : 0;
 
             // Calculate log-odds
-            const logOdds = intercept + (ageCoef * age) + sexCoef + tumorSizeCoef + readmissionCoef + systemicTherapyCoef + resectionCoef;
+            const logOdds = intercept + (ageCoef * age) + sexCoef + tumorSizeCoef + tumorLocationCoef + resectionCoef;
 
             // Convert log-odds to probability
             const odds = Math.exp(logOdds);
             const probability = odds / (1 + odds);
 
             // Display the result
-            document.getElementById('result').innerText = `Probability of >10 day LOS: ${(probability * 100).toFixed(2)}%`;
+            document.getElementById('result').innerText = `Probability of Prolonged LOS: ${(probability * 100).toFixed(2)}%`;
         }
     </script>
 </body>
 </html>
+
